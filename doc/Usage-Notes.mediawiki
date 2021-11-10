@@ -1,0 +1,82 @@
+<h1>Rufus usage notes</h1>
+
+The goal of this page is to provide __technical__ answers and details on topics that aren't really suited for the FAQ.
+
+== General ==
+
+=== Why the increase in size between Rufus 1.4.12 and Rufus 2.0? ===
+
+Rufus 2.0 adds the following features:
+* Grub 2.0 support (including Grub 2.0 system files)
+* Grub4DOS support (including Grub4DOS system files)
+* Windows To Go support
+* Decompression of <code>.Z</code>, <code>.gz</code>, <code>.bz2</code>, <code>.xz</code> and <code>.lzma</code> image files
+* additional translations
+* new messages for existing translations, including fairly verbose messages aimed at clarifying Windows To Go restrictions
+It also upgrades Syslinux from 5.10 to 6.03, which is much bigger in size.
+
+Considering this, the size increase is actually quite minimal for the amount of new features that were integrated.
+
+=== Where to manually copy the Syslinux/GRUB files, if Rufus can't download them ===
+
+First of all, one thing you need to be aware is that, even if Rufus cannot download additional GRUB or Syslinux files (no internet connection, etc.), it should be able to fall back to using the internal version of these files, which are embedded with the application. So, regardless of the messages you got when trying to download GRUB/Syslinux files, if Rufus offers you the option, you should still attempt to go through the whole creation process and see if that works for you.
+
+Especially, now that most Linux distributions have upgraded to Syslinux 6.04, and considering that Rufus does embed generic Syslinux 6.04 files, the remote download from our servers is mostly there as a '''safety measure''', in case a distribution has added some very custom patches on top of Syslinux that they really won't be able to boot with otherwise, which I am not aware any of the major distributions (Debian, Arch, Ubuntu, etc.) has ever done.
+
+This means that, in most cases, even if Rufus cannot download the Syslinux/GRUB files, it may still be able to create a bootable USB regardless.
+
+If, on the other hand, you still can't create the drive in Rufus, or find that it doesn't boot as expected, and want to use your own local files, one thing you will find out is that you cannot simply try to replicate the directory structure that exists on our server locally (from the [https://github.com/pbatard/rufus-web/tree/gh-pages/files <code>files/</code>] repository) in the hope that it will "just" work, because it won't. The reason for that is that the local directory structure must also match the '''custom''' version string that is used by the ISO bootloader, and almost all distributions, as well as releases of the same distribution, use a different '''custom''' version identifier.
+
+Thus, in order to use a custom Syslinux or GRUB bootloader once Rufus has downloaded it, without interfering with distros that can use the regular one, we want to have local directories that match the custom version from the ISO.
+
+What this means is that, to manually copy one of the GRUB/Syslinux bootloaders for use with your ISO, you need to follow the steps from the example below (which is done against the Ubuntu 18.04, so you will need to customize them for yours):
+
+# Open the ISO in Rufus and look at the log. You will see something like <code>Detected Syslinux version: 6.03/20171017 (from '/isolinux/isolinux.bin')</code>
+# The part before the slash gives you the main version you should use, so, because this is Syslinux, you first need to create a <code>syslinux-6.03\</code> directory in a
+#* <code>%LocalAppData%\Rufus\</code> directory if using Rufus 3.15 or later (<code>%LocalAppData%</code> usually translates to <code>C:\Users\<your_user_name>\AppData\Local</code> but you should really just <code>%LocalAppData%</code> in the Windows File Explorer toolbar, and it will automatically take you to the right directory.
+#* <code>rufus_files\</code> directory that exists at the same level as the place where you have your Rufus executable if using Rufus 3.14 or earlier
+# At this stage, you should look on the server, in <code>syslinux-6.03\</code> to see if there exists a directory with the same name as the second part you saw from the log (here <code>20171017</code>). If there is, you should simply copy this directory along with the content that it contains. If not, then you should create a directory with the same name, and copy the files that exists in the upper directory on the server. In other words, in this example, you would create a <code>syslinux-6.03\20171017\</code> directory and then copy the Syslinux files you can find at the root of [https://github.com/pbatard/rufus-web/tree/gh-pages/files/syslinux-6.03] into that directory (you shouldn't copy the subdirectories).
+
+Once you have done that, Rufus will be able to pick up the files as if it had been able to download them.
+
+== Windows To Go ==
+
+=== Why do I need Windows 8 or later to create a Windows To Go drive? ===
+
+Unlike regular ISO &rarr; UFD creation, where one can just extract the ISO files, the creation of a Windows To Go drive requires the '''application''' of a Windows Image (<code>sources\install.wim</code>), which is a completely different process from a regular extraction. Because there is no small sized Open Source library that does WIM image application, we are forced to use the WIM API from Microsoft.
+
+Moreover, the Microsoft WIM API requires the <code>install.wim</code> image to be accessible '''as a regular file''' before it can process (we can't just point the WIM API to the ISO, or part of the ISO that contains the image), which means that, to be able to do that without having first to extract a ~4GB file to a temporary drive (and make sure it gets deleted when we're done with it), we need the capability to mount an ISO as virtual drive, which is something that only Windows 8 and later offers '''natively''' (and of course, there again, there are no Open Source solutions we can use to create a virtual drive). Because Windows 7 and earlier do not provide '''native''' ISO mount capabilities, we simply can not support these OSes at this stage.
+
+=== Can I create a Windows To Go drive using a Windows 7 ISO? ===
+
+Yes. But as explained above, you will only be able to create a Windows 7 To Go drive in Rufus is you run it on Windows 8 or later.
+
+=== What's the deal with the MSR on Windows To Go GPT drives? ===
+
+Due to an antiquated boot process that they are too scared to change (namely hiding stuff in the hope users won't notice it), Microsoft requires '''every''' GPT drive that Windows will run from to have an MSR, so we follow suit. Note that Windows '''installation''' GPT media don't have this requirement (since they don't run Windows but merely install it). Read more about MSR [https://msdn.microsoft.com/en-us/library/windows/hardware/dn640535%28v=vs.85%29.aspx#gpt_faq_what_disk_require_msr here].
+
+=== What's the deal with the EFI system partition on Windows To Go GPT drives? ===
+
+The UEFI specs '''hint''' (but aren't entirely explicit) that a FAT32 partition should be used for FIXED media to boot stuff in EFI mode. And indeed, Windows To Go will not boot on GPT drives unless you installed BCD on a FAT formatted EFI system partition (which should be created '''without a label'''!). But then that means you are restricted with the FAT32 minimum partition size, which is tied to the minimum cluster size that you can create a FAT32 FS with which itself is tied to the disk sector size. This means for instance that, for a 4k drive, you must create a ~300MB EFI system partition if you want to be able to format it as FAT32.
+
+=== What's the deal with FIXED/REMOVABLE drive? ===
+
+If you are trying to use an older version of Windows for Windows To Go, you may have gotten a message from Rufus telling you that it was unlikely to boot due to your drive being of 'REMOVABLE' type.
+
+The FIXED/REMOVABLE attribute is a property of the flash drive you are using. Most USB HDD drivers have the FIXED attribute whereas most USB Flash drives have the REMOVABLE attribute. And as the message should have indicated, this is not something that software can change or work around, it is a hardware feature of the drive you use.
+
+Microsoft designed older versions of Windows '''not''' to boot from a REMOVABLE drive, so that is why, if Rufus detects that you are installing Windows To Go on a drive with the REMOVABLE attribute, it will warn you that this will probably not work.
+
+You either have to use a more recent version of Windows (the latest updates of Windows 10 don't care whether the drive is FIXED or REMOVABLE for booting), or you need to find a drive with the FIXED attribute to use with Rufus.
+
+In the log, Rufus will tell you whether the drive you use is FIXED or REMOVABLE, in the line that starts with "Disk type;" with something like:
+
+<pre>Found USB 3.0 device 'SanDisk Extreme USB Device' (0781:5580)
+1 device found
+Disk type: Removable, Disk size: 16GB, Sector size: 512 bytes</pre>
+
+or
+
+<pre>Found VHD device 'Microsoft Virtual Disk'
+1 device found
+Disk type: FIXED, Disk size: 8GB, Sector size: 512 bytes</pre>

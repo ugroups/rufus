@@ -1,0 +1,178 @@
+== Introduction ==
+
+Rufus is meant to natively support about 40 main languages (meaning that the same executable supports '''ALL''' these languages without the need to download additional files).
+
+Internally, this is accomplished through the use of a simple [https://github.com/pbatard/rufus/blob/master/res/loc/rufus.loc <code>rufus.loc</code>] file, containing elementary commands that look something like this (the following is an excerpt for the French translation):
+<pre>
+################################################################################
+l "fr-FR" "French (Français)" 0x040c, 0x080c, 0x0c0c, 0x100c, 0x140c, 0x180c, 0x1c0c, 0x200c, 0x240c, 0x280c, 0x2c0c, 0x300c, 0x340c, 0x380c, 0xe40c
+v 1.0.23
+b "en-US"
+
+g IDD_DIALOG
+t IDS_DRIVE_PROPERTIES_TXT "Options de Périphérique"
+t IDS_DEVICE_TXT "Périphérique"
+t IDS_BOOT_SELECTION_TXT "Type de démarrage"
+t IDC_SELECT "Sélection"
+t IDS_IMAGE_OPTION_TXT "Option d'image"
+t IDS_PARTITION_TYPE_TXT "Schéma de partition"
+t IDS_TARGET_SYSTEM_TXT "Système de destination"
+t IDS_FILE_SYSTEM_TXT "Système de fichiers"
+t IDS_CLUSTER_SIZE_TXT "Taille d'unité d'allocation"
+t IDS_LABEL_TXT "Nom de volume"
+t IDS_FORMAT_OPTIONS_TXT "Options de Formatage"
+t IDC_BAD_BLOCKS "Vérification de mauvais blocs"
+t IDC_QUICK_FORMAT "Formatage rapide"
+t IDC_EXTENDED_LABEL "Ajouter un label étendu et une icône"
+t IDS_STATUS_TXT "Statut"
+t IDCANCEL "Fermer"
+t IDC_START "Démarrer"
+t IDC_LIST_USB_HDD "Lister les disques durs USB"
+t IDC_OLD_BIOS_FIXES "Ajouter les options de compatibilité pour vieux BIOS"
+t IDC_RUFUS_MBR "Utiliser le MBR Rufus avec ID"
+
+(...)
+
+g IDD_UPDATE_POLICY
+t IDD_UPDATE_POLICY "Paramètres de mises à jour"
+t IDS_UPDATE_SETTINGS_GRP "Options"
+t IDS_UPDATE_FREQUENCY_TXT "Recherche mises à jour"
+t IDS_INCLUDE_BETAS_TXT "Inclure les bétas"
+t IDC_CHECK_NOW "Chercher maintenant"
+t IDCANCEL "Fermer"
+
+t MSG_001 "Autre instance détectée"
+t MSG_002 "Une autre instance de Rufus est en cours d'exécution.\n"
+	"Veuillez fermer la première instance avant d'en lancer une seconde."
+t MSG_003 "ATTENTION : TOUTES LES DONNEES DU VOLUME '%s' VONT ETRE EFFACEES.\n"
+	"Pour continuer cette opération, cliquez sur OK.\nPour quitter cliquez sur ANNULER."
+t MSG_004 "Mises à jour"
+t MSG_005 "Voulez-vous autoriser Rufus à chercher des mises à jour en ligne?"
+t MSG_006 "Fermer"
+t MSG_007 "Annuler"
+t MSG_008 "Oui"
+t MSG_009 "Non"
+t MSG_010 "Blocs défectueux détectés"
+t MSG_011 "Vérification complète : %d bloc(s) défectueux détecté(s)\n"
+	"  %d erreur(s) de lecture\n  %d erreur(s) d'écriture\n  %d erreur(s) de corruption\n"
+t MSG_012 "%s\nUn rapport plus détaillé peut être obtenu à :\n%s"
+</pre>
+
+These elementary commands can:
+* Change the text being displayed on a UI element (including dialog titles)
+* Change the orientation of text back and forth between left-to-right and right-to-left
+
+However, because it is inconvenient to have to edit a text file manually, as a translator, you do '''not''' edit the  <code>rufus.loc</code> file manually, but instead use an application called ''Pollock'' (Which stands for ''PO → LOC'', as its main goal is to convert a <code>.po</code> file to a <code>.loc</code> file) along with [https://poedit.net/ Poedit], to conveniently edit the translation for a specific language.
+
+== Creating a new translation ==
+
+This option is no longer available at this stage, as we consider that we have now covered the main set of languages we wanted the application to be translated into.
+
+== Editing an existing translation ==
+
+'''IMPORTANT: Starting with version 3.2 you should no longer edit <code>rufus.loc</code> directly but use Pollock and Poedit instead, as advised below.'''
+
+# Make sure you have Poedit installed in the default location. If you don't have Poedit installed, download it from [https://poedit.net/download here].
+# Download the latest <code>pollock.exe</code> from [https://rufus-web.akeo.ie/locale/pollock.exe here].
+# Save it to the directory that you will use to carry out your translation work. Be mindful that Pollock might erase any previous translation files and data that exists there.
+# Launch Pollock and follow the instructions on the screen. Entries that require editing should be highlighted in orange in the right part of Poedit.
+# Make sure you have a look at the [https://github.com/pbatard/rufus/blob/master/res/loc/ChangeLog.txt Translation Changelog] that lists all the changes that occurred between the existing version of the translation and the one you are updating to. Especially, the Changelog may contain details on how you can proceed to display the new messages from within the application.
+# Edit and test your translation. When done, simply close Poedit. Pollock should prompt you if you want to e-mail the <code>.po</code> file.
+# E-mail the <code>.po</code> file and congratulate yourself on another job well done... ;)
+
+'''NOTE''' Do not bother translating a message if it's the same as the English version (e.g. "OK", "Start", "Windows to Go", etc.), as the translation will not be preserved for the next time you edit your language. In other words, you should leave entries blank if they don't need to be translated.
+
+== Testing a translation ==
+
+The following provides a series of tests you can run to ensure that most of the elements of the UI are tested for a translation:
+
+=== Main dialog ===
+
+* Select FAT32 as the file system, select FreeDOS for the boot type and click Start. 
+** Pay attention to the warning that says that all data will be erased. Ensure that it is properly translated.
+* Run the same test as above, but check the ''Bad blocks'' checkbox. Let the bad blocks check run for a while and check that the message on the status bar is correct. Then click Cancel, and confirm that you get an ''Operation Cancelled'' message in your language.
+* Click on the ''Show advanced drive properties'' and ''Show advanced format Option''. The advanced options will be displayed. Confirm that they look OK.
+* If you haven't done so already, download the [https://github.com/pbatard/rufus/raw/master/res/loc/test/menu_c32_test.iso <code>menu_c32_test.iso</code>] (Don't worry - it's only 120 KB). Select that <code>menu_c32_test.iso</code> file. If you click START, you should get the ''Obsolete menu.c32'' dialog. Confirm that your translation is correct and select ''Yes'' to download the file.
+* You will now see the 'ISOHybrid image detected' dialog. Confirm that your text is properly translated for this message and leave 'Write in ISO Image mode' selected, then click OK.
+* Select either OK or Cancel on the 'ALL DATA WILL BE DESTROYED' dialog.
+* Press the cheat-mode combinations (Alt-Something) listed [https://github.com/pbatard/rufus/wiki/FAQ#Power_keysCheat_modes here] and have a look at the message on the status bar for each of those. The ones with enabled/disabled can be pressed multiple times. At the very least you should issue the Alt-R combination to delete all registry settings.
+* Quit Rufus and restart it. Because you use ''Alt-R'' above, you should get the initial dialog about allowing the check for updates. Pay special attention to this dialog as this is usually the first one people will see. You can use ''Alt-R'' and exit Rufus at any time if you want to test that dialog again.
+* If you haven't done so already, download the [https://github.com/pbatard/rufus/raw/master/res/loc/test/windows_to_go.iso <code>Windows To Go.iso</code>] (356 KB). This should enable the display of the Windows To Go options on the main dialog. Note that since this is a dummy image, an attempt to create a bootable flash drive with it will fail.
+* I also encourage you to test the creation of a Windows-based and Linux based bootable ISO of your choice, as well as trying to open a non-bootable ISO, for completion of the main dialog test.
+* Also make sure that you check each dropdown, including the one in the advanced options.
+
+=== Log dialog ===
+
+* Click the ''Log'' button on the Main dialog. There are only 3 buttons that should be translated, so it should be easy to check. The log content itself will always be in English, regardless of your language.
+* Make sure the title is translated if needed (<code>t IDD_LOG "Some translation"</code>)
+* '''Note:''' For a ''right-to-left'' translation, you will find that the content of the log will still be displayed as a ''left-to-right'' control (i.e. left-aligned text, scrollbar on the right). This is intentional as the content of the log is meant to be 100% in English.
+
+=== About dialog ===
+
+* Click the (i) button from the main dialog
+* Besides all the other elements, make sure a line such as ''English translation: John Smith'' is being displayed (<code>MSG_176</code>) under ''Copyright © 2011-2018 Pete Batard / Akeo''. I '''insist''' on giving you credit for your work!!
+* The text in the ''Additional Copyrights'' is not translatable, and for a ''right-to-left'' translation, you will also find that the content is displayed in full ''left-to-right'' mode. This is intentional.
+* Make sure the title is translated.
+
+=== License ===
+
+* From the ''About'' dialog, click the ''License'' button.
+* Make sure the title and the ''Close'' button are translated
+* The GPLv3 license is not translatable and is always displayed ''left-to-right'' mode. This is intentional.
+
+=== Update Check ===
+
+* If you haven't done so, go back to the main dialog and press ''Alt-Y'' to force the update check to succeed, then click the Settings button.
+* Make sure you check each dropdown as well as the title.
+* Click ''Check Now''. The update check should succeed and the ''New Version'' dialog will be displayed.
+
+=== New Rufus Version ===
+
+* Before testing this, you need to enable the "Force update" setting. This is done by pressing ''Alt-Y'' on the Main dialog. You '''must''' see a message telling you that ''Force Update'' is enabled.
+* If you have seen the message, then you should click ''About'' &rarr; ''Updates'' &rarr; ''Check Now''.
+* After Rufus contacts the update server, and because "Force update" is enabled, you should see the new version dialog.
+* Ensure that all elements are properly translated, then click download and save the new version.
+* Pay attention to the ''Download'' button, which should change to ''Launch'' after the download is complete.
+* Also pay attention to the various message appearing on the status bar during this operation (remember that you can also open the Log to view them.
+
+=== Other checks ===
+
+* While a Rufus application is already running try to launch it again. You should get a translated message indicating that no 2 Rufus applications can run at the same time.
+* (Optional) If you have a Windows 7 or later ISO, start a format operation using it, and then cancel when Rufus starts to write the <code>sources\install.wim</code> file. This will display the warning about blocking operation (<code>MSG_080</code>).
+
+If you go through all of the above, then you should have all the important features of your translation covered.
+
+
+== Translating the Rufus Homepage ==
+
+To translate the Rufus Homepage ([https://rufus.ie]):
+* '''Before''' you begin, please send an <a href="mailto:pete@akeo.ie?subject=Rufus Homepage translation">e-mail</a> indicating the language you are interested in translating so that I can tell you if somebody else already volunteered a translation for the same language. I'd rather not have you waste your time if somebody else is already working on it.
+* Download and install the latest version of [https://poedit.net/download Poedit].
+* Download the Rufus Homepage POT file [https://rufus-web.akeo.ie/locale/index.pot index.pot].
+* Launch Poedit.
+* Click on the button: ''Create new translation &mdash; Take an existing PO file or POT template and create a new translation from it.''.
+* When prompted, select the <tt>index.pot</tt> you just downloaded.
+* Select your language (using the primary location for your region, e.g. for French, you would use <tt>fr_FR</tt>).
+* Translate the strings, making sure to preserve the various HTML markup (e.g.: <tt>&lt;a %s&gt;</tt>, <tt>&lt;b&gt;</tt>, <tt>&amp;ndash;</tt>, etc.). Please make sure NOT to add extra spaces, especially on the closing tags (for instance it's <tt>&lt;\a&gt;</tt>, NOT <tt>&lt;\ a&gt;</tt>).
+* Save the file under the name ''index'', and <a href="mailto:pete@akeo.ie?subject=Rufus Homepage translation">send me</a> '''both''' the generated <tt>index.po</tt> and <tt>index.mo</tt>.<br />'''IMPORTANT:''' Please make sure you send me the <code>.po</code> and '''NOT''' the <code>.pot</code>.
+
+=== Additional notes ===
+
+Please make sure you pay attention to the "Notes for translators" as they may provide additional information.
+
+Once you have provided me with a translation, and I have applied it to the site, it is always a '''good idea''' to copy/paste the whole content of the translated webpage into a text editor (Word, etc.) and use the spell check to check for typos. Also note that one the translation has been applied, you will always find the most up to date copy of your <tt>index.po</tt> and <tt>index.mo</tt> in the [https://rufus-web.akeo.ie/locale/] directory from the site. For instance, the <tt>index.po</tt> for French can be found under [https://rufus-web.akeo.ie/locale/fr/LC_MESSAGES/].
+
+Finally, as the web page gets updated with new content, the translation may need to be updated as well. This is very easy to do however:  Just open the latest <tt>index.po</tt>, then download the current <tt>[https://rufus-web.akeo.ie/locale/index.pot index.pot]</tt> and then go to ''Catalog'' &rarr; ''Update from POT file'' and select the updated <tt>index.pot</tt>. Poedit will then let you know the strings that need to be edited. I will of course alert you when an update may be required.
+
+=== Editing an existing homepage translation ===
+
+If you want to edit an existing homepage translation:
+* Download and install the latest version of [https://poedit.net/download Poedit].
+* Navigate to [https://rufus-web.akeo.ie] and select the language you want to edit in the menu (even if the page was already displayed in the language you want). The URL will change to something like <tt>https://rufus-web.akeo.ie/?locale=xy_XY</tt>
+* Remember the <tt>xy</tt> part and now navigate to [https://rufus-web.akeo.ie/locale/]. You will see a bunch of directories, including an <tt>xy</tt> one.
+* Now navigate down to this directory until you find the files <tt>index.po</tt> and <tt>index.mo</tt>. Download both these files to your computer.
+* Launch Poedit, select ''Edit a Translation'' and open the <tt>index.po</tt> file you just downloaded (or if you set Poedit to automatically open <tt>.po</tt> files, double click on it).
+* It's also usually a good idea to reapply the current <tt>.pot</tt> at this stage by:
+** Downloading the very latest [https://rufus-web.akeo.ie/locale/index.pot index.pot] (just click this link and select ''Save As'' in your browser
+** Going to ''Catalog'' &rarr; ''Update from POT file'' and select the <tt>index.pot</tt> you just saved
+* Edit the translation and save it, then <a href="mailto:pete@akeo.ie?subject=Rufus Homepage translation">send me</a> '''both''' the updated <tt>index.po</tt> and <tt>index.mo</tt>.

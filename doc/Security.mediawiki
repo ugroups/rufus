@@ -1,0 +1,194 @@
+= General =
+
+The purpose of this page is to describe the various security and safety measures that are employed by Rufus, with the aim of giving '''you''', its user, some confidence that the application will never be trying to do anything nefarious or unwanted behind your back.
+
+As you should be aware, anything that can install code that runs as a bootloader also becomes a critical part of the chain of trust in computing. After all, it only takes a compromised bootloader to compromise a whole computer, regardless of the security software that may be installed on it. As such, an application that creates bootable devices, which is one of the most common usages of Rufus, must be be able to demonstrate to its users that it is beyond the speck of any doubts regarding what it might write on the device.
+
+This page is therefore written to help you understand that, even if you think that not much is going on behind the scenes with regards to security in an application like Rufus, there is actually much more than meets the eye, and we hope that the pointers we provide on this page can help confirm for yourself, that Rufus simply cannot do anything nefarious without your knowledge.
+
+= Open Source =
+
+== Licensing ==
+
+The first thing we will mention then, and as you may already be aware of, is that Rufus is Open Source. This means that, should you be paranoid about running an executable which you did not compile yourself, on account that the person who compiled it may have added some hidden malicious behaviour onto it, it is always in your power to compile your own version of Rufus, from scratch, to ensure that nothing gets added.
+
+Furthermore, if you do have concerns about what the application might be doing behind the scenes, the Open Source nature of Rufus grants you the ability to study the actions of every single component, to '''validate''' that, just as we indicate, Rufus is not doing anything that isn't part of its official mandate.
+
+But even better than that, Rufus is [http://www.gnu.org/philosophy/free-sw.en.html Free Software], as ensured by its [http://www.gnu.org/licenses/gpl-3.0.en.html GPLv3] license, which means that, as opposed to other more restrictive Open Source licenses (such as BSD, Apache, etc.), you are further guaranteed that, if you compile your own version of Rufus from the published source, it will not be missing any features (such as the ability to run it on the device(s) of your choosing) or have any restrictions compared to the "official" version. You will end up with a version that performs in the exact same manner as the one published by its author.
+
+Thus, like all Free Software, Rufus provides you with the '''freedom''' to compile and run the same binary as the one you get from the official website, as opposed to a crippled version that may have parts missing. For instance, you may be aware that Apple's Mac OS kernel is based on Open Source software, which sounds good at first glance. However, due to its use of a less user-focused BSD license, it is not possible for anybody but Apple to actually recompile a kernel from that source, and use it as a drop-in replacement for the "official" Mac OS kernel.
+
+When using the GPLv3 license however, which is what Rufus uses, such a restrictive behaviour is impossible. This is because, unlike many of its Open Source counterparts, the GPL license is not one that asserts that developers should have more "freedoms" than the application users, including the "freedom" to restrict them, or deny access to some of the feature-set from the official binary, be it by withholding some of the source, or by not giving users the ability to run their own modified version on the exact same set of devices as the original.
+
+This, in turn, should give you greater trust that, because it is not possible for its developers to use the loose terms of other Open Source licenses to "hide" any piece of the final application, what you do see from the source is exactly what you get from the official binary, and you are always in a position to compare the binary you produce on your own against the official one, to confirm that there wasn't anything added in the compiled code, or any part for for which you don't have the full details.
+
+Finally, this also means that, should Rufus development cease altogether, you will never be stranded, as you would be with a closed source proprietary application (or a semi-open source application that still relies on closed source components), since the first developer interested can pick up the work exactly where it stopped and release updated versions of Rufus should they choose to. Barring the digital signature (which is only there to establish trust, and not restrict the use of the application), any new binaries being published in this fashion behave exactly the same as if they had been published by the original developer, without any restrictions.
+
+== Use of Open Source tools ==
+
+While, for convenience, most of the development and testing of Rufus is accomplished through the use of Microsoft Visual Studio, which is a '''closed source''' IDE (Integrated Development Environment), most of the Rufus executables we publish are produced using MinGW/[https://gcc.gnu.org/ gcc], which are Free Software toolchains. This means that both Rufus, as well as the components that it embeds are produced using tools that can be verified for integrity.
+
+One exception to this, are the [https://github.com/pbatard/uefi-ntfs UEFI:NTFS ] and [https://github.com/pbatard/efifs NTFS EFI driver] components, which, while being Free Source themselves, see their binaries generated through Visual Studio Community Edition, due to size constraints (sadly the <code>gcc</code> produced binaries are a lot larger than the Visual Studio one, and we want to keep the size of Rufus small). But of course, should you be worried about this, and as pointed out before, you can always recompile EFI binaries using the compiler of your choice, and then recompile Rufus with these EFI components, without losing any functionality.
+
+Another exception is the version of Rufus published in the Microsoft App Store, as, first of all, there doesn't exist a version of MinGW that can compile an ARM or ARM64 application (which we need for the store) and also because compiling the x86 and x64 version using MinGW would make the process of uploading the packaged application to the store a lot more inconvenient. You can however rest assured that the versions we publish in the App Store and the one you can download from the website are compiled from the exact same source.
+
+= Code =
+
+== Git ==
+
+Rufus uses <code>git</code> as its Version Control System.
+
+While this makes it convenient for anybody to access and verify the source (through the [https://github.com/pbatard/rufus github project]) it also makes it next to impossible for a malicious developer to try to insert a nefarious code change without being detected, as, through its use of hashes, <code>git</code> has an inherent built in security mechanism that prevents anyone from replacing old code without being noticed.
+
+This means that, even if the main Rufus developer's machine were to be compromised, it still wouldn't be possible from someone to add something malicious to the existing code, without being detected.
+
+Oh, and of course, as a source version control software, git offers anyone the ability to quickly and effortlessly duplicate the whole source tree, along with the full history of how each line of the code came into existence, to help confirm that, if there exist elements of code that may look out of place at first glance, these can be validated as having been inserted as part of a genuine feature, and not with alternate motives in mind.
+
+== GitHub verified commits and 2FA ==
+
+Obviously, since we are using GitHub to host our git repository, we are also making use of all the security feature it provides, including:
+
+* Only enabling access to our GitHub account through '''physical''' 2FA (i.e. not through phone validation, which is known to be prone to be hacked, but instead through a dedicated 2FA hardware device). This means that, even if someone were to somehow read our account password, they still wouldn't be able to access our account as they would still need to '''steal''' a physical device, which we would immediately find out.
+* As can been seen from our [https://github.com/pbatard/rufus/commits/master recent list of commits], making sure that all our commits are verified through digital signatures (GPG), using a key that is of course completely different from anything else that is associated with either our GitHub account or the Digital Signature key used for Rufus.
+* '''Enforcing''' that, on the master branch, only Verified commits can ever be pushed, which means that, for someone to be able to push a malicious release of Rufus that would go undetected, they would have to steal at least 6 completely different passwords and/or private keys (including one physical), before they could be in a position to do so...
+
+== Static analysis ==
+
+When it comes to ensuring that the application code it up to the highest security standards, Rufus also makes uses of [https://scan.coverity.com/ Coverity] as well as the Visual Studio static analysis tool, to help identify potential security issues. For reference, you can find the latest Coverity report for the project [https://scan.coverity.com/projects/pbatard-rufus here].  While it needs to be pointed out that, due to its single-user nature, identifying things such as buffer overflows is not as critical in Rufus as it is for a web application (since it's not potentially going to allow a malicious remote user to compromise a server or access other people's data), Rufus still does take the safety of user data seriously, and, as the report does confirm, we are committed to identifying and fixing any valid bug reported by the various analysis tools we have at our disposal.
+
+== Security best practices ==
+
+During development, we also try to keep up to date with new threats that might be relevant for Rufus, by keeping alert to Windows applications vulnerability reports.
+
+For instance, when it was recently exposed that there could exist a vulnerability with using the default Windows mechanisms of loading of DLLs, if a user had been tricked to previously download a malicious DLL into their general download folder, we took the steps of adding explicit code in Rufus to alleviate that risk. 
+
+Of course, we apply the same alertness and proactive approach with regards to the Rufus web server, and will continue to do so for any threats that we deem relevant.
+
+= Digital Signatures =
+
+== Executable signature ==
+
+Rufus is digitally signed using SHA-256, which should make it impossible for someone to compromise the server and replace a download executable with a malicious version without being detected.
+
+It needs to be pointed out that this is also the reason why it doesn't make any sense to provide MD5 or SHA hashes of the Rufus executables on the website, as hashes are '''already''' part of the signature and are automatically verified by Windows, every time the application launches.
+
+Also, the combined use of a digital signature with an application that is fully Open Source makes it exceedingly easy to demonstrate, '''with proof''', whether the application contains something nefarious. So if you see reports such as ''"OMG, Antivirus X classified Rufus as a trojan!!!"'', with little evidence to substantiate this claim, whereas it IS very easy to compile a version from source and then compare it with the official one to highlight alleged malicious differences, you can almost certainly dismiss such as claim as either another [https://en.wikipedia.org/wiki/False_positives_and_false_negatives#False_positive_error false positive] or mere [https://en.wikipedia.org/wiki/Fear,_uncertainty_and_doubt FUD].
+
+== Tamper-proof signed executable ==
+
+Further to the above, starting with Rufus 3.15, the executables we digitally sign are the ones produced by the automated GitHub Actions processes, which means that '''you''' can validate that there is simply no possibility that we may have secretly tampered with it locally.
+
+For instance, if you take the signed <code>rufus-3.15.exe</code> we publish, remove its digital signature completely (<code>signtool.exe remove /s rufus-3.15.exe</code>), make sure the PE Checksum is zeroed (this is required because <code>signtool.exe</code> always updates the PE Checksum, whereas MinGW generated executables always have it set to zero) and check its SHA-256, you will find that it is <code>6af9c13b5414d96cce4d3b27fb9f8387f48b3f4ba3113daa224b01fd1e3a792d</code> which is the exact same SHA-256 as [https://github.com/pbatard/rufus/runs/3229854842?check_suite_focus=true the one that is displayed as part of the public build process].
+
+This means that you can be '''absolutely''' certain that the executable you got was built from the exact source we publish, with no possibility that "hidden" code was added behind the scenes into what we signed and uploaded. In other words, Rufus is [https://en.wikipedia.org/wiki/WYSIWYG WYSIWYG]: What you see (from the public source) is what you get. No more. No less.
+
+And this also means that, should you hear any dramatic report of Rufus allegedly containing malware, trojans or conducting spurious actions behind the scenes, you can simply ask whoever is reporting it: ''"Well, where the heck are those alleged malicious actions supposed to happen in the code??? There exists irrefutable proof that the executable you analysed was produced exclusively from the public GitHub code, therefore you should be able to find clear direct evidence in said code, for whatever you think is malicious... If, however, you cannot do that, then it can only mean that your analysis is incorrect"''.
+
+Note that one exception to the rule above are the binaries we produce for the Windows Store version of Rufus, which we compile locally on account that it's currently much more convenient to do so and also because Windows Store packages are vetted by Microsoft before publishing anyway. But we may look into using the GitHub Actions binaries for the Windows Store packages in the future...
+
+== Update signature ==
+
+Rufus does have an auto-update feature, which may download and run a new version. Thus, one thing that also needs to be considered, especially because Rufus is an application that needs to run elevated, is that it should not just blindly trust an update it just downloaded, even if it is from its own server, and run it. This is because there is no guarantee that someone many not be intercepting your communications and inserting their own malicious data.
+
+As such, to prevent the possibility of someone having compromised the download server (or the communication lines) with the intent of providing users with a malicious download, whenever a new update is being downloaded, Rufus does 2 things before allowing it to run:
+
+# Validate that the download has a digital signature and that it is valid
+# Check that the name for the digital signature is one that we expect (since it would be very difficult for someone to fake our identity for digital signatures, without being detected by the certification authority).
+
+This, we believe, ensures that, no matter what happens, users can not be tricked into running a false update, that could compromise their system.
+
+== Overall download signature verification ==
+
+Furthermore, starting with version 3.2, everything (and I '''do''' mean everything) Rufus downloads from its server(s), is digitally signed with a unique key (which is different from the one used for the executable digital signature) and validated through PKI (in other words, the Rufus binary includes a public key that matches the private key we used to sign server content, and uses it to confirm that whatever it downloads has not been tampered with). This validation is applied to things like GRUB or Syslinux binaries (and it therefore goes on top of the Hash Database validation -- see below), as well as the text file that indicates whether a new version is available and where to download it.
+
+If a downloaded file is found to have failed this overall signature validation, it is automatically deleted.
+
+= General application behaviour =
+
+== Data Collection and User Consent ==
+
+The first time you launch Rufus on a new computer, you will see a prompt asking you whether you want to enable the check for update. And if you click the "More Information" button on that prompt, you will see a paragraph detailing the exact amount of data that may get collected when update checks are enabled (which while being very minimal, is still being disclosed in full).
+
+This is done because we firmly believe that applications should be 100% transparent about the data they collect, if they are collecting data, and furthermore, that a data collection process should always be opt-in, no matter how small that collection is, and provide users with the option to opt-out from it altogether.
+
+The only small exception you may see to this rule (because we were asked to do so, and see it as a reasonable compromise) is in case you downloaded the file labelled <code>rufus.exe</code>, instead of one of the regular <code>rufus-#.#.exe</code> and is detailed [[FAQ#Rufus_connects_to_the_internet_but_I_never_allowed_it_to__why|in the FAQ]].
+
+At this stage we also feel that, because we mentioned the loaded "data collection" word, we must stress that the data we "collect" is really the minimal amount required for an update check (current version of Rufus, IP address &mdash; which is collected automatically by the web server, OS version), and that the only use we make of it outside of the automated update check, is for '''private''' usage statistics. Especially, we do not provide any of this data to any third party, nor do we use it to identify individual users. Mostly, we use this data to find trends in Windows OS usage, uptake for the new versions of Rufus, as well as getting an idea of the countries that use Rufus the most. That's really all there is to it.
+
+== Data preservation ==
+
+When it comes to the local behaviour of the Rufus application itself, one of our prime goals is to ensure that you don't involuntarily lose data that you didn't mean to lose. As such, there are various behaviours being employed in the code to try to ensure that, even if there is a bug, it shouldn't be possible for Rufus to start overwriting a system disk by mistake (such as your <code>C:</code> drive), and further more, we also make sure that we limit the number of drives that are listed by default to only the ones we can readily identify as USB flash drives, virtual drives, or memory cards (with users having to explicitly perform an action if they want to expand that list). For instance, we also try to differentiate USB flash drives from USB hard drives, to prevent the possibility of an external backup drive being formatted, if both such a drive and a flash drive are being plugged at the same time.
+
+We do understand that such restrictive behaviour is somewhat different from what other similar applications might choose to do. However, we believe that slightly inconveniencing some users as a result, by preventing them to perform an operation they wish to do (such as formatting any drive), is better than inconveniencing other users, by too easily allowing them to perform an operation they do not wish to do (such as reformatting a backup drive).
+
+== GDPR ==
+
+Since we are getting asked about this as well, you should know that, because the update check is opt-in, and the information about the data we may collect is made accessible in very clear terms '''before''' the user makes his or her choice, we are fully compliant with GDPR (which mandates the full disclosure of the data, as well as a clear opt-in mechanism).
+
+As a matter of fact, because Rufus has always relied on the principle that governs the introduction of the GDPR, such as ensuring that users have full control over the data they want or don't want to disclose, we have been compliant with GDPR long before it came about, from the very first day we added the update check.
+
+Finally, it needs to be stressed out that we don't collect or share any information that can be used to identify or track users across the web site, such as user names or e-mail addresses.
+
+And in case you are wondering about the ads that may appear on the official web site, please know that we have disabled any non GDPR compliant tracking from Google AdSense (in effect making all of the ads from our site "non-targeted"), as allowed by Google.
+
+= Mitigated risks =
+
+== Download of Syslinux/GRUB resources ==
+
+In a somewhat unfortunate design choice, the Syslinux developers decided to completely separate the initial optical media boot loader from the disk/USB media boot loader. And while they did introduce a somewhat modular design further down the line (with modules that are compatible with both modes), with the introduction of Syslinux 5.x, they rendered these modules incompatible between versions (a bit as if, if you had an executable that ran on Windows 7, you found that it refused to run altogether on Windows 10). As to GRUB, its more monolithic (but more forgiving) design means that providing USB bootable support for a specific version usually requires providing a rather large (compared to Rufus) second stage bootloader.
+
+All of this means that, in some circumstances, Rufus needs to request a download for a GRUB or Syslinux file from our download servers.
+
+We identified this as a potentially major security risk, as, if unmitigated, this could lead to very serious compromise of important boot files. For instance, let's consider that a user wants to create a bootable USB with the latest version of [https://tails.boum.org/ tails], and that a government agency, which we will hereby call the ''.A.S.N'', is looking for ways to compromise that user's bootable drive. Even if the user took all precautions to validate that the version they obtained of the tails ISO was untouched, they would still run in the following scenario, if Rufus didn't have any provisions against it:
+
+# User launches Rufus and selected the tails ISO then clicks ''Start''.
+# Rufus alerts the user that it needs to download 2 Syslinux components from its server. These are low level components that are executed very early during the boot process (but only in BIOS/Legacy mode - in UEFI mode, these are not being used at all).
+# User accepts the download.
+# The ''.A.S.N'', which monitors traffic to the Rufus download server, detects the request and injects its own version of the files instead of the ones from the servers.
+# Rufus completes the bootable drive creation, using the malicious files.
+# User boots tails in BIOS/Legacy mode, and the malicious contents gets executed during first stage boot, which is then used to install a trojan, or take action to try to disclose the real identify of the tails user to the ''.A.S.N'', if they visit a site such as Wikileaks, etc.
+
+Of course, this is a less than ideal situation, and, starting with Rufus 2.10, we have added a way to mitigate these concerns.
+
+== Hash DB table mitigation ==
+
+As mentioned above, with Rufus 2.10 and later, downloaded content is validated through the use of a [https://github.com/pbatard/rufus/blob/master/src/db.h database], which is embedded in Rufus, and which includes the SHA-256 hashes for all the downloadable files that resided on the server at the time of the release (and because the executable is digitally signed, it is impossible for someone to alter the DB content without being detected). So, for instance, if you are creating a bootable USB from a tails 2.4 ISO, which happens to use the release version of Syslinux 6.03 (the files for which are currently available on the server), you'll see something like this in the log:
+<pre>
+Using existing './rufus_files/syslinux-6.03/20150819/ldlinux.sys' ✓
+Using existing './rufus_files/syslinux-6.03/20150819/ldlinux.bss' ✓
+</pre>
+
+The ✓ above means that Rufus validated the SHA-256 of the downloaded content and found that it matched one of the entries it has in its database.
+If instead, you were to see a ✗, it means one of a following:
+
+* The downloaded file is more recent than something we had on the server had the time of the release. For instance, if Syslinux 7.01 was to be released tomorrow, and you happened to have a distro that uses 7.01, you would see an ✗ even if the file you downloaded is identical to the one I placed on the server, since the DB goes only as far as files that were present at the time of the release
+* Your download is corrupted (can happen if you have one of these firewalls that alters content)
+* Someone has tapped your connection and is doing something very nasty with the files your are downloading.
+
+<p>At any rate, if you are a security conscious user, you'll probably want to check if there are any ✗'s in your log and decide for yourself whether you want to proceed...</p>
+
+Also, it needs to be pointed out that this Hash DB serves a different purpose than the signature validation being enacted when downloading content from the Rufus servers (see above). The signature validation aims at confirming that the '''remote''' content has not been tampered with, whereas the Hash DB aims at confirming that the '''local''' content has not been tampered with either. The reason both are needed is because one could very well imagine a malicious program running on someone's computer that alters content that has already been downloaded and validated. Therefore, to protect against both remote and local attacks, we need the double validation mechanism.
+
+== Remote script execution ==
+
+Starting with Rufus 3.5, a new feature was introduced that enables the download of ISO images from the application.
+
+Because this is mostly geared towards the download of Windows retail ISOs, for which Microsoft adds a lot of hurdles to access (hurdles that may change altogether from one day to the next) and which are updated on semi-frequent basis, we decided that using a static function call in Rufus, that Microsoft could render obsolete on a whim even if we tried to be smart about it and fetch something like remote JSON data to populate the various versions of Windows, was not for the best and that the best approach was to provide that feature through a [https://github.com/pbatard/Fido PowerShell script].
+
+This, we see, is the only way to insure that we'll always have enough '''flexibility''' to address, at very short notice, whatever new hurdle Microsoft wants to throw at people who just want to access retail Windows ISO download links.
+
+However, we do understand that some people might rightfully be very concerned at the idea of having an application downloading and then running a PowerShell script from a remote server, even more so as it is doing so in elevated fashion (which we also need to do to prevent issues arising from the use of Internet Explorer as the script's browser engine).
+
+To alleviate these concerns, we will detail exactly what we have done to ensure that you can always rest assured that the script is not going to try to do anything malicious behind your back:
+
+# As you will have come to expect, the script is fully Open Source and publicly available from the [https://github.com/pbatard/Fido Fido project repository]. As such it can easily be validated not to do anything malicious or not to contain reported vulnerabilities that would need to be addressed.
+# Even as we do use a server link on https://rufus.ie to point to the specific release of the Fido script Rufus should download (as provided by the text file https://rufus.ie/Fido.ver), we do validate that the URL we retrieve from the server begins with https://github.com/pbatard/Fido, to ensure that, even if the main server is compromised (though we should point out that this content is also served by GitHub, which means either GitHub or our GitHub account would have to be compromised) only a file that comes from the official project can ever be downloaded.
+# Furthermore, we also validate that the script we download is signed with a digital signature (RSA 2048, for which only a single person has access to the private key, private key which is of course protected by a strong password and does not reside on '''any''' remote server, not even as a cloud backup), and, unless we find that the signature can be validated with the corresponding public key that is embedded in Rufus, the script immediately deletes the download. What this means is that even if an attacker gains access to the served content, they still won't be able to provide a malicious script '''unless''' they also compromised a local machine to obtain the private key as well as figured out the private key's password...
+# We also do '''not''' keep the download saved script anywhere on disk during Rufus operations except right before we invoke PowerShell, and when we do save the script, it is done using a random name every single time. Outside of this, the script only ever resides in memory which means that, even if the user machine is compromised, an attack vector such as [https://en.wikipedia.org/wiki/Time_of_check_to_time_of_use TOCTOU] can not be used to alter the script.
+# Finally, because we do understand that, even with all the above safeties in place, some people may still bark at the idea of having an application download and execute a remote PowerShell script, you should note that the ISO download feature is only enabled '''if''' the 'Check for updates' is also enabled in the Rufus settings (and on first usage, Rufus prompts the user whether they want to enable the update check or not, rather than default to enable as many other applications do), as we consider that a person who chose not to enable update checks from our servers most likely also doesn't want execution of a remote script. This means that, if 'Check for update' is disabled, the script is never even accessed and none of the above needs to apply.
+
+= Other =
+
+== Reproducible Builds ==
+
+Reproducible builds are available starting with the release of Rufus 3.4. This means that, if you have installed the same MinGW toolchain as the one we used for compilation, then you should be able to easily verify that the executable payload we produced is identical, bit for bit, to the one you can produce on your machine, further demonstrating that nothing nefarious could have been added to the official binary you downloaded from the website.
